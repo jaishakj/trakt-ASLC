@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trakt-letterboxd-sync"
+version = "0.1.0"
+description = "Trakt-Authoritative Automated Sync + Letterboxd CSV Bridge"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "greenlet>=3.1.1",
+    "alembic>=1.13.3",
+    "aiosqlite>=0.20.0",
+    "httpx>=0.27.2",
+    "apscheduler>=3.10.4",
+    "cryptography>=43.0.1",
+    "python-dotenv>=1.0.1",
+    "python-multipart>=0.0.12",
+    "jinja2>=3.1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "pytest-mock>=3.14.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]

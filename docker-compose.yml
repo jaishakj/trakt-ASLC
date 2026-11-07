@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: trakt-letterboxd-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trakt_sync
+      POSTGRES_PASSWORD: trakt_sync_password
+      POSTGRES_DB: trakt_sync_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trakt_sync -d trakt_sync_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trakt-letterboxd-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:///./data.db
+      TRAKT_CLIENT_ID: ${TRAKT_CLIENT_ID:-}
+      TRAKT_CLIENT_SECRET: ${TRAKT_CLIENT_SECRET:-}
+      TRAKT_REDIRECT_URI: ${TRAKT_REDIRECT_URI:-http://localhost:8000/auth/trakt/callback}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      SECRET_KEY: ${SECRET_KEY:-generate_a_random_32_byte_secret_key_here}
+      SYNC_INTERVAL_MINUTES: ${SYNC_INTERVAL_MINUTES:-15}
+    ports:
+      - "8000:8000"
+    volumes:
+      - app_data:/app/data
+      - ./exports:/app/exports
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
+  app_data:
